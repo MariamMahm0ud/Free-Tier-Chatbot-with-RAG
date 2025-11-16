@@ -39,9 +39,11 @@ A fully self-hostable chatbot system that scrapes a target website, builds a sea
 
 1.  **Clone the repository:**
     ```bash
-    git clone <your-repository-url>
-    cd <repository-folder>
+    git clone https://github.com/MariamMahm0ud/Free-Tier-Chatbot-with-RAG
+    cd Free-Tier-Chatbot-with-RAG
+
     ```
+    
 
 2.  **Set up the environment file:**
     ```bash
