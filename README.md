@@ -150,18 +150,12 @@ This method is for local development and debugging.
     -   Open your browser to **[http://localhost:7777](http://localhost:7777)**
 
 ---
+
 ## 🎥 Demo Video
+Click the link below to download and watch the demo:
 
-You can watch the project demo here:
+👉 [Download / Watch Demo](https://github.com/MariamMahm0ud/Free-Tier-Chatbot-with-RAG/raw/main/2025-11-16-05-40-25_ncKnjIwb.mkv)
 
-👉 [Click to watch the demo](https://github.com/MariamMahm0ud/Free-Tier-Chatbot-with-RAG/raw/main/2025-11-16-05-40-25_ncKnjIwb.mkv)
-
-## 🎥 Demo Preview
-
-<video width="600" controls>
-  <source src="2025-11-16-05-40-25_ncKnjIwb.mkv" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
 
 ## 💡 Troubleshooting
 
