@@ -1,0 +1,56 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+docs/
+
+# Test files
+tests/
+test_*.py
+*_test.py
+
+# Data directories (will be mounted as volumes)
+scraper/output/
+scraper/chunks/
+rag_service/chroma_db/
+
+# Logs
+*.log
+logs/
+
+# Temp files
+tmp/
+temp/
+.tmp
+
+# Environment files (will be provided separately)
+.env
+.env.local
+
+

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-top: 0;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        input[type="checkbox"] {
+            margin-right: 5px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .output {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            min-height: 100px;
+        }
+        .sources {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+        }
+        .sources ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .sources li {
+            margin: 5px 0;
+        }
+        .error {
+            color: #dc3545;
+            margin-top: 10px;
+        }
+        .loading {
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>RAG Chatbot</h1>
+        <p>Query the knowledge base using natural language.</p>
+        
+        <div class="input-group">
+            <label for="query">Query:</label>
+            <textarea id="query" rows="3" placeholder="Enter your question here..."></textarea>
+        </div>
+        
+        <div class="input-group">
+            <label>
+                <input type="checkbox" id="useLLM">
+                Use local LLM (requires GPT4All model)
+            </label>
+        </div>
+        
+        <button id="submitBtn" onclick="submitQuery()">Send</button>
+        
+        <div id="output" class="output" style="display: none;">
+            <h3>Answer:</h3>
+            <div id="answer"></div>
+        </div>
+        
+        <div id="sources" class="sources" style="display: none;">
+            <h3>Sources:</h3>
+            <ul id="sourcesList"></ul>
+        </div>
+        
+        <div id="error" class="error" style="display: none;"></div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+        
+        async function submitQuery() {
+            const query = document.getElementById('query').value.trim();
+            const useLLM = document.getElementById('useLLM').checked;
+            const submitBtn = document.getElementById('submitBtn');
+            const output = document.getElementById('output');
+            const sources = document.getElementById('sources');
+            const error = document.getElementById('error');
+            const answer = document.getElementById('answer');
+            const sourcesList = document.getElementById('sourcesList');
+            
+            if (!query) {
+                alert('Please enter a query');
+                return;
+            }
+            
+            // Hide previous results
+            output.style.display = 'none';
+            sources.style.display = 'none';
+            error.style.display = 'none';
+            
+            // Show loading
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Loading...';
+            answer.innerHTML = '<span class="loading">Processing your query...</span>';
+            output.style.display = 'block';
+            
+            try {
+                const response = await fetch(`${API_URL}/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        query: query,
+                        top_k: 5,
+                        use_llm: useLLM
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Display answer
+                let answerText = data.answer;
+                if (data.llm_error) {
+                    answerText += `\n\n[Note: LLM generation failed, using fallback. Error: ${data.llm_error}]`;
+                }
+                answer.textContent = answerText;
+                output.style.display = 'block';
+                
+                // Display sources
+                if (data.sources && data.sources.length > 0) {
+                    const uniqueUrls = [...new Set(data.sources.map(s => s.url).filter(Boolean))];
+                    sourcesList.innerHTML = uniqueUrls.map(url => `<li><a href="${url}" target="_blank">${url}</a></li>`).join('');
+                    sources.style.display = 'block';
+                }
+                
+            } catch (err) {
+                error.textContent = `Error: ${err.message}. Make sure the API is running at ${API_URL}`;
+                error.style.display = 'block';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Send';
+            }
+        }
+        
+        // Allow Enter key to submit (Ctrl+Enter)
+        document.getElementById('query').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                submitQuery();
+            }
+        });
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,73 @@
+version: "3.8"
+
+services:
+  scraper:
+    build:
+      context: .
+      dockerfile: scraper/Dockerfile
+    container_name: rag-scraper
+    env_file:
+      - .env
+    volumes:
+      - ./scraper/output:/app/scraper/output
+      - ./scraper/chunks:/app/scraper/chunks
+    networks:
+      - rag-network
+    restart: "no"
+    command: ["sh", "-c", "echo Scraper ready. Run manually with: docker-compose run scraper"]
+
+  rag_service:
+    build:
+      context: .
+      dockerfile: rag_service/Dockerfile
+    container_name: rag-api
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./scraper/chunks:/app/scraper/chunks:ro
+      - ./rag_service/chroma_db:/app/rag_service/chroma_db
+    networks:
+      - rag-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    depends_on:
+      - scraper
+
+  web:
+    build:
+      context: .
+      dockerfile: web/Dockerfile
+    container_name: rag-web
+    env_file:
+      - .env
+    environment:
+      RAG_API_URL: "http://rag_service:8000"
+    ports:
+      - "7860:7860"
+    networks:
+      - rag-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7860"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+    depends_on:
+      - rag_service
+
+networks:
+  rag-network:
+    driver: bridge
+
+volumes:
+  scraper_output:
+  scraper_chunks:
+  chroma_db:

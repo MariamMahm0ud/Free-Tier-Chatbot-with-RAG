@@ -1,0 +1,57 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+ENV/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment variables
+.env
+
+# ChromaDB (keep persistence but ignore if too large)
+rag_service/chroma_db/*.db
+rag_service/chroma_db/*.parquet
+# But keep the directory structure
+!rag_service/chroma_db/.gitkeep
+
+# Scraped data (optional - uncomment if you don't want to commit scraped data)
+# scraper/output/
+# scraper/chunks/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
